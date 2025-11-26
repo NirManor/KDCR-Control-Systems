@@ -4,53 +4,101 @@ Implementation of constraint-based kinematics for a 3-DOF parallel robot, includ
 
 ## Problem Description
 
+![Problem Description](images/problem_description.png)
+
 We analyze a **3-DOF parallel robot** with:
 - **Central platform:** Equilateral triangle with side length r = 2 m
 - **Leg 1 & 2:** Revolute-Prismatic chain on circular track (radius R = 4 m)
   - Link length: L = 3.5 m
   - Actuated: slider angles θ₁, θ₂ on track
 - **Leg 3:** Prismatic joint with variable length d₃
+  - Connected to fixed point on track
 - **End-effector:** Platform position [x, y] and orientation φ
 
-## Robot Parameters
+### Robot Parameters
 
 - r = 2 m (platform side)
-- L = 3.5 m (link length)  
+- L = 3.5 m (link length)
 - R = 4 m (track radius)
 
-## Constraint Equations
+---
 
-Each leg connects platform vertices to track points:
+## Mathematical Formulation
 
-**Leg 1:** (a₁ₓ - b₁ₓ)² + (a₁ᵧ - b₁ᵧ)² = L²
-**Leg 2:** (a₂ₓ - b₂ₓ)² + (a₂ᵧ - b₂ᵧ)² = L²
-**Leg 3:** (a₃ₓ - b₃ₓ)² + (a₃ᵧ - b₃ᵧ)² = d₃²
+### Coordinate Systems
+- **Base frame {0}:** Centered at circle center
+- **Platform frame:** Attached to moving platform
+- **Slider positions:** On circular track at angles θ₁, θ₂
+
+### Constraint Equations
+
+Each leg connects platform vertices to track points via links:
+
+**Leg 1 constraint:**
+```
+(a₁ₓ - b₁ₓ)² + (a₁ᵧ - b₁ᵧ)² = L²
+
+where:
+  a₁ = platform vertex 1 position
+  b₁ = slider 1 position on track
+  L = link length
+```
+
+**Leg 2 constraint:**
+```
+(a₂ₓ - b₂ₓ)² + (a₂ᵧ - b₂ᵧ)² = L²
+```
+
+**Leg 3 constraint:**
+```
+(a₃ₓ - b₃ₓ)² + (a₃ᵧ - b₃ᵧ)² = d₃²
+```
 
 **Platform geometry** (equilateral triangle):
-- a₁ = [x + r·cos(φ + π/3), y + r·sin(φ + π/3)]ᵀ
-- a₂ = [x, y]ᵀ
-- a₃ = [x + r·cos(φ), y + r·sin(φ)]ᵀ
+```
+a₁ = [x + r·cos(φ + π/3), y + r·sin(φ + π/3)]ᵀ
+a₂ = [x, y]ᵀ
+a₃ = [x + r·cos(φ), y + r·sin(φ)]ᵀ
+```
 
 **Slider positions** (on circular track):
-- b₁ = [R·cos(θ₁), R·sin(θ₁)]ᵀ
-- b₂ = [R·cos(θ₂), R·sin(θ₂)]ᵀ
-- b₃ = [0, -R]ᵀ (fixed)
+```
+b₁ = [R·cos(θ₁), R·sin(θ₁)]ᵀ
+b₂ = [R·cos(θ₂), R·sin(θ₂)]ᵀ
+b₃ = [0, -R]ᵀ (fixed)
+```
 
-## Main Algorithms
+---
+
+## Algorithms
 
 ### 1. Inverse Kinematics
 
 **Problem:** Given platform pose [x, y, φ], find all joint configurations [θ₁, θ₂, d₃]
 
 **Algorithm:**
-1. Form constraint equations F(x,q) = 0
-2. Solve system symbolically/numerically
-3. Eliminates variables systematically to find all solution branches
-4. Filter physically valid solutions (joint limits, collisions)
+```
+Input: x_desired = [x, y, φ]
+Output: q_all = matrix of all valid joint configurations
 
-**Implementation:** inverse_kin.m
-- Uses MATLAB symbolic solving
-- Returns 4-8 valid configurations per pose
+1. Form constraint equations F(x,q) = 0
+   - Three distance constraints (legs 1, 2, 3)
+   - Function of unknowns: θ₁, θ₂, d₃
+
+2. Solve system symbolically/numerically
+   - Eliminates variables systematically
+   - Finds all solution branches
+
+3. Filter physically valid solutions
+   - Check joint limits: -π ≤ θᵢ ≤ π, |dⱼ| < 0.7 m
+   - Verify no link collisions
+
+4. Return all valid q configurations
+```
+
+**Implementation:** `inverse_kin.m` uses MATLAB symbolic solving
+- Handles multiple solution branches
+- Example: 4-8 valid configurations per pose
 - Round-trip error: < 10⁻⁴
 
 ### 2. Forward Kinematics
@@ -66,7 +114,7 @@ Each leg connects platform vertices to track points:
 4. Solve resulting polynomial P(t) = 0 numerically
 5. Convert roots back to φ values and verify
 
-**Implementation:** forward_kin.m
+**Implementation:** `forward_kin.m`
 - Handles up to 8th degree polynomials
 - Returns up to 4 distinct solutions
 
@@ -93,7 +141,7 @@ Each leg connects platform vertices to track points:
 4. Compute joint velocities using Jacobian
 5. Validate for joint limits and singularities
 
-**Implementation:** joint_plan.m, pos_plan.m
+**Implementation:** `joint_plan.m`, `pos_plan.m`
 - Generates smooth trajectories with zero boundary conditions
 - Validates feasibility throughout motion
 
@@ -138,6 +186,17 @@ Each leg connects platform vertices to track points:
 - 3 velocity profile options
 - Polynomial profile has zero boundary accelerations
 - Validated for joint limits and singularities
+
+#### Sample Trajectory Results
+
+**Joint Position Tracking:**
+![Joints Position](images/joints_position.jpg)
+
+**Prismatic Joint (d₃) Position:**
+![d3 Position](images/d3_position.jpg)
+
+**Complete Trajectory Overview:**
+![Trajectories](images/trajectories.jpg)
 
 ### Jacobian Analysis
 - Singularities: 4-6 within workspace

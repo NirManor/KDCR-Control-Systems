@@ -4,6 +4,8 @@ Implementation of Lagrangian-based dynamics formulation for a 3-DOF serial robot
 
 ## Problem Description
 
+![Problem Description](images/problem_description.png)
+
 We analyze a **3-DOF serial robot** with:
 - **Link 1:** Revolute joint (θ₁), length l₂ = 1.6 m
 - **Link 2:** Revolute joint (θ₂), length l = 1.2 m, center of mass at l/2
@@ -11,24 +13,8 @@ We analyze a **3-DOF serial robot** with:
 - **End-effector:** Connected to platform with fixed link l₄
 - **Load:** Platform mass M variable (nominal 0.5 kg, testing 0-1 kg)
 
-### Robot Configuration
-```
-     θ₁ (revolute)
-      ↓
-     ----  l₂ = 1.6 m
-      ↓
-    θ₂ (revolute)
-      ↓
-     ||||  l = 1.2 m (center of mass at l/2)
-      ↓
-    d₃ (prismatic, variable)
-      ↓
-     ---- l₄ (fixed connection to load)
-      ↓
-    [Load M]
-```
+### Robot Parameters
 
-**Robot Parameters:**
 - l₂ = 1.6 m (link 2 length)
 - l = 1.2 m (link 3 length)
 - l₄ = 0.3 m (fixed end connection)
@@ -131,17 +117,17 @@ Use numerical integration (ODE45):
 
 ---
 
-## Function Descriptions
+## Function Summary
 
-| Function | Purpose | Inputs | Outputs |
-|---|---|---|---|
-| `dynamics_mat.m` | Compute H, C, G matrices | q, q̇ | H(q), C(q,q̇), G(q) |
-| `tau_plan.m` | Inverse dynamics planning | q_des, q̇_des, q̈_des | τ trajectory |
-| `state_eq.m` | ODE function for forward dynamics | t, X=[q,q̇] | dX/dt |
-| `forward_kin.m` | End-effector position from joint angles | q | x_ee position |
-| `inverse_kin.m` | Joint angles from desired position | x_des | q configuration |
-| `jacobian_mat.m` | Compute Jacobian matrix | q | J (3×3) |
-| `main.m` | Complete simulation framework | - | Plots and results |
+| Function | Purpose |
+|---|---|
+| dynamics_mat.m | Compute H, C, G matrices |
+| tau_plan.m | Inverse dynamics planning |
+| state_eq.m | ODE function for forward dynamics |
+| forward_kin.m | End-effector position |
+| inverse_kin.m | Joint angles from position |
+| jacobian_mat.m | Compute Jacobian |
+| main.m | Complete simulation |
 
 ---
 
@@ -159,8 +145,8 @@ Use numerical integration (ODE45):
 
 ## References
 
-1. Craig, J. J. (2005). "Introduction to Robotics: Mechanics and Control"
-2. Tsai, L. W. (1999). "Robot Analysis: The Mechanics of Serial and Parallel Manipulators"
-3. Siciliano, B., Sciavicco, L., Villani, L., & Oriolo, G. (2009). "Robotics: Modelling, Planning and Control"
+1. Craig, J. J. (2005). Introduction to Robotics: Mechanics and Control
+2. Tsai, L. W. (1999). Robot Analysis: The Mechanics of Serial and Parallel Manipulators
+3. Siciliano, B., Sciavicco, L., Villani, L., & Oriolo, G. (2009). Robotics: Modelling, Planning and Control
 
 **Execution time:** main.m ~30-60 seconds (includes 3 scenarios + plots)
