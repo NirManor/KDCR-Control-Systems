@@ -4,7 +4,7 @@ A comprehensive robotics systems implementation demonstrating the complete pipel
 
 **Course:** Kinematics, Dynamics, and Control of Robots (036026)  
 **Institution:** Technion - Israel Institute of Technology  
-**Program:** TASP (Technion Autonomous Systems Program), M.Sc.  
+**Faculty:** Mechanical Engineering  
 **Instructor:** Assoc. Prof. Yizhar Or  
 **Semester:** Spring 2023  
 **Authors:** Nir Manor & Sheng Liu  
@@ -195,7 +195,7 @@ cd Advanced-Control-Systems && run main_project4.m
   title={Kinematics, Dynamics, and Control of Robots},
   author={Manor, Nir and Liu, Sheng},
   school={Technion - Israel Institute of Technology},
-  program={TASP},
+  faculty={Mechanical Engineering},
   course={036026},
   year={2023}
 }
